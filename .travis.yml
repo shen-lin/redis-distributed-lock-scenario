@@ -1,0 +1,20 @@
+sudo: required
+language: node_js
+node_js:
+  - "10"
+services:
+  - docker
+  
+before_install:
+  - npm install -g yarn@1.16.0
+  - docker build -t shenlin84/redis-distributed-lock-webapp .
+script:
+  - docker images shenlin84/redis-distributed-lock-webapp
+  
+after_success:
+  - echo $TRAVIS_BRANCH
+  - if [ $TRAVIS_BRANCH == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push shenlin84/redis-distributed-lock-webapp;
+    fi  
+

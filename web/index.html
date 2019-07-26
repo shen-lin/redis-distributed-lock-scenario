@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Redis Distributed Lock Sample</title>
+    <script>
+      function setMask(mask) {
+          document.querySelector('input#input').disabled = mask;
+          document.querySelector('input#balance').disabled = mask;
+          document.querySelector('button#show').disabled = mask;
+          document.querySelector('button#deposit').disabled = mask;
+      }
+
+      function deposit() {
+        setMask(true);
+        var amount = document.querySelector('input#input').value;
+        var data = {
+          'amount': amount
+        }
+        var xhttp;
+        if (window.XMLHttpRequest) {
+          xhttp = new XMLHttpRequest();
+        } else {
+          xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            var data = xhttp.responseText;
+            if (data === 'OK') {
+              document.querySelector('span#depositResponse').innerText = 'Deposit Succeeded';
+            } else if (data === 'LOCKED') {
+              document.querySelector('span#depositResponse').innerText = 'Another process is updating your account balance. Please try again later.';
+            }
+            setMask(false);
+          }
+        };
+
+        xhttp.open("POST", "/deposit", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(JSON.stringify(data));
+      }
+
+      function showBalance() {
+        setMask(true);
+        var xhttp;
+        if (window.XMLHttpRequest) {
+          xhttp = new XMLHttpRequest();
+        } else {
+          xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            var balanceData = JSON.parse(this.responseText);
+            document.querySelector('input#balance').value = balanceData.balance;
+            setMask(false);
+          }
+        };
+        xhttp.open("GET", "/balance", true);
+        xhttp.send();
+      }
+    </script>
+  </head>
+  
+  <body>
+    <div style="background: #F9F9F9;">
+      <h3>Deposit to your bank account</h3>
+      $<input id="input"></input>
+      <button id="deposit" onClick='deposit()'>Deposit</button>
+      <span id='depositResponse'></span>
+    </div>
+
+
+
+    <div style="background: #F9F9F9;">
+      <h3>Show your balance</h3>
+      $<input id="balance"></input>
+      <button id="show" onClick='showBalance()'>Show account balance</button>
+    </div>
+  </body>
+</html>
