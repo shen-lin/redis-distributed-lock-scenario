@@ -12,6 +12,7 @@ const redis = require("redis");
 
 let redisHost = '127.0.0.1';
 
+console.log(`NODE_ENV ${env}`);
 if (env !== 'local') {
   redisHost = 'redis-master';
 }
