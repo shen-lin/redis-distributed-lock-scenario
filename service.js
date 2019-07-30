@@ -74,6 +74,6 @@ app.post('/deposit', (req, res) => {
   });
 });
 
-app.use('/web', express.static('web'))
+app.use('/', express.static('web'))
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
